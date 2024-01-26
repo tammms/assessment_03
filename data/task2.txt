@@ -1,0 +1,50 @@
+Write your Task 2 answers in this file
+
+mongoimport --db=bedandbreakfast -c listings_and_reviews --file=listings.json
+
+task2.2
+
+db.listings_and_reviews.aggregate([
+    {$match: {"address.country":{ $regex :"australia",
+                     $options:"i"} }},
+    {$out:"listings"}
+]);
+
+
+
+task 2.3
+
+db.listings.aggregate([
+    {$unwind:"$reviews"},
+    {$project: {date: "$reviews.date",
+                listing_id: "$reviews.listing_id",
+                reviewer_name: "$reviews.reviewer_name",
+                comments: "$reviews.comments",
+                _id:0}},
+   {$project: {date: 1,
+                listing_id: 1,
+                reviewer_name: 1,
+                comments:{ $replaceAll: { input: "$comments", find: "\n", replacement: "" } } }},
+   {$project: {date: 1,
+                listing_id: 1,
+                reviewer_name: 1,
+                comments:{ $replaceAll: { input: "$comments", find: "\r", replacement: "" } } }},
+   {$project: {date: 1,
+                listing_id: 1,
+                reviewer_name: { $replaceAll: { input: "$reviewer_name", find: ",", replacement: "" } },
+                comments:1 }},
+   {$out: "reviews"}                                    
+]);
+
+
+task 2.4
+db.listings.update(
+    {},
+    {$unset:{reviews:""}},
+    {$multi: true}
+);
+
+
+task 2.5
+
+mongoexport --db=bedandbreakfast --collection=reviews --type=csv --fields=date,listing_id,reviewer_name,comments --out=C:\Users\tammy\OneDrive\Documents\VTTP\workshop-paf\paf_assessment_template\data\reviews.csv
