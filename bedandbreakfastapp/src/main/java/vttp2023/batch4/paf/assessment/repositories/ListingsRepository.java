@@ -83,9 +83,9 @@ public class ListingsRepository {
 		MatchOperation matchFilter = Aggregation.match(
 								Criteria.where("address.suburb").regex(suburb,"i")
 										.and("price").lte(priceRange)
-										.and("accomodates").gte(persons)
+										.and("accommodates").gte(persons)
 										.and("min_nights").lte(duration));
-		ProjectionOperation fields = Aggregation.project("_id","name", "accomodates", "price");
+		ProjectionOperation fields = Aggregation.project("_id","name", "accommodates", "price");
 		SortOperation sortPrice = Aggregation.sort(Sort.by(Direction.DESC,"price"));
 		Aggregation pipeline = Aggregation.newAggregation(matchFilter, fields, sortPrice);
 		List<Document> docList = template.aggregate(pipeline, "listings", Document.class)
@@ -93,13 +93,13 @@ public class ListingsRepository {
 
 		List<AccommodationSummary> summaryList = new LinkedList<>();
 		System.out.println("\n\n\n");
-		System.out.println("\nResult\n" + docList.size());
+		System.out.println("\nResult doucmuent size\n" + docList.size());
 		for(Document doc: docList){
 
 			AccommodationSummary summary = new AccommodationSummary();
 			summary.setId(doc.getString("_id"));
 			summary.setName(doc.getString("name"));
-			summary.setAccomodates(doc.getInteger("accomodates"));
+			summary.setAccomodates(doc.getInteger("accommodates"));
 			summary.setPrice(doc.get("price", Number.class).floatValue());
 
 			summaryList.add(summary);
